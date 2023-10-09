@@ -6,8 +6,16 @@
   </head>
   <body>
     What chat room would you like to enter?<br />
-    <input id="room-name-input" type="text" size="100" /><br />
-    <input id="room-name-submit" type="button" value="Enter" />
+    <form method="POST" action="{% url 'index' %}" name="room">
+      {% csrf_token %}
+      <input
+        id="room-name-input"
+        type="text"
+        name="room_name"
+        size="100"
+      /><br />
+      <input id="room-name-submit" type="submit" value="Enter" />
+    </form>
 
     <script>
       document.querySelector("#room-name-input").focus();

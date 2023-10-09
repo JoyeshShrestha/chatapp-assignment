@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import status
 
 from .models import User
 from rest_framework.views import APIView
@@ -9,7 +10,20 @@ from rest_framework.exceptions import AuthenticationFailed
 import jwt, datetime
 
 class RegisterView(APIView):
-    def post(self,request):
+    # class RegisterView(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            response_data = {
+                'username': user.username,
+                'email': user.email,
+                'password': user.password,
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def post(self,request):
         User.objects.create()
         serializer = UserSerializer(data = request.data)
         serializer.is_valid(raise_exception = True)
@@ -45,7 +59,7 @@ class LoginView(APIView):
 
         response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {
-                        'message' : decoded_payload
+                        'message' : token
 
         }
         

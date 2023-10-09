@@ -1,9 +1,8 @@
 import json
-
+from groups.models import Groups
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 import threading
-
 # class ChatConsumer(WebsocketConsumer):
 #     def connect(self):
 #         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
@@ -48,15 +47,26 @@ import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from .authentication import LoginAuthentication
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    authentication_classes = [LoginAuthentication]
+    
+    
+    
     async def connect(self):
+
+        user = self.scope.get('user')
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
 
         # Join room group
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        #self.room_group_name lai export garna parcha jastai cha
+        print(self.room_name)
+        
 
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -79,3 +89,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print("webscoket: "+str(threading.get_native_id()) )
         # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message}))
+
+    
